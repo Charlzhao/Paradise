@@ -7,7 +7,11 @@
 //
 
 #import "AppDelegate.h"
-
+#import "MainTabBarController.h"
+#import "LeftViewController.h"
+#import "RightViewController.h"
+#import "MMDrawerController.h"
+#import "MMDrawerVisualState.h"
 @interface AppDelegate ()
 
 @end
@@ -15,9 +19,48 @@
 @implementation AppDelegate
 
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+    [self _createMMDrawer];
+    
     return YES;
+}
+
+
+
+
+- (void)_createMMDrawer
+{
+    UIViewController * leftSideDrawerViewController = [[LeftViewController alloc] init];
+    //中间控制器
+    MainTabBarController *mainTabVc = [[MainTabBarController alloc] init];
+    //右边控制器
+    UIViewController * rightSideDrawerViewController = [[RightViewController alloc] init];
+    leftSideDrawerViewController.view.backgroundColor = [UIColor redColor];
+    rightSideDrawerViewController.view.backgroundColor = [UIColor greenColor];
+    //容器控制器，管理左 中 右控制器
+    MMDrawerController * drawerController = [[MMDrawerController alloc]
+                                             initWithCenterViewController:mainTabVc
+                                             leftDrawerViewController:leftSideDrawerViewController
+                                             rightDrawerViewController:rightSideDrawerViewController];
+    
+    //设置左右两边宽度
+    [drawerController setMaximumRightDrawerWidth:[UIScreen mainScreen].bounds.size.width];
+    [drawerController setMaximumLeftDrawerWidth:150];
+    
+    //设置手势区域
+    [drawerController setOpenDrawerGestureModeMask:MMOpenDrawerGestureModeAll];
+    [drawerController setCloseDrawerGestureModeMask:MMCloseDrawerGestureModeAll];
+    
+    //设置动画效果
+    MMDrawerControllerDrawerVisualStateBlock block = [MMDrawerVisualState swingingDoorVisualStateBlock];
+    [drawerController setDrawerVisualStateBlock:block];
+    
+    self.window.rootViewController = drawerController;
+    
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
